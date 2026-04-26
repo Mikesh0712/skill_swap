@@ -2,6 +2,7 @@ services:
   - type: web
     name: skillswap-backend
     env: node
+    plan: free
     rootDir: server
     buildCommand: npm install
     startCommand: npm start
@@ -9,8 +10,8 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        sync: false # You will need to provide this in the Render dashboard
+        sync: false
       - key: CLIENT_URL
-        sync: false # You will need to provide this in the Render dashboard
+        sync: false
       - key: JWT_SECRET
-        sync: false # You will need to provide this in the Render dashboard
+        sync: false
