@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Symbols+2&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-pixel: "Press Start 2P", cursive;
+  --font-silkscreen: "Silkscreen", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius: var(--radius);
+}
+
+@layer base {
+  :root {
+    --background: #f0f4f8;
+    --foreground: #09090b;
+    --card: #ffffff;
+    --card-foreground: #09090b;
+    --popover: #ffffff;
+    --popover-foreground: #09090b;
+    --primary: #00e5ff;
+    --primary-foreground: #000000;
+    --secondary: #ff007f;
+    --secondary-foreground: #ffffff;
+    --muted: #e2e8f0;
+    --muted-foreground: #64748b;
+    --accent: #b400ff;
+    --accent-foreground: #ffffff;
+    --destructive: #ef4444;
+    --destructive-foreground: #f8fafc;
+    --border: #cbd5e1;
+    --input: #e2e8f0;
+    --ring: #00e5ff;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* GREEN/FUCHSIA/YELLOW THEME */
+    --background: #030a06;
+    --foreground: #e0fbfc;
+    --card: #08150c;
+    --card-foreground: #e0fbfc;
+    --popover: #08150c;
+    --popover-foreground: #e0fbfc;
+    
+    /* Neon Green */
+    --primary: #39ff14;
+    --primary-foreground: #000000;
+    
+    /* Neon Fuchsia */
+    --secondary: #ff00ff;
+    --secondary-foreground: #ffffff;
+    
+    /* Subdued Dark Green for muted backgrounds */
+    --muted: #0d2514;
+    --muted-foreground: #8ab4f8;
+    
+    /* Neon Yellow Accent */
+    --accent: #ffe600;
+    --accent-foreground: #000000;
+    
+    --destructive: #ff2a2a;
+    --destructive-foreground: #ffffff;
+    
+    /* Glowing borders */
+    --border: #39ff1440;
+    --input: #0a1a0f;
+    --ring: #39ff14;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.glass {
+  background: rgba(8, 21, 12, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.dark .glass {
+  background: rgba(10, 15, 20, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Subtle, clean text accents instead of harsh glowing neon */
+.neon-text {
+  color: var(--primary);
+  text-shadow: 0 0 1px var(--primary);
+}
+
+.neon-text-pink {
+  color: var(--secondary);
+  text-shadow: 0 0 1px var(--secondary);
+}
+
+.neon-border {
+  border-color: rgba(57, 255, 20, 0.3);
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.05);
+}
+
+.neon-border-pink {
+  border-color: rgba(255, 0, 255, 0.3);
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.05);
+}
+
+/* Pixelated Art Styles */
+.pixel-text {
+  font-family: var(--font-pixel);
+  letter-spacing: -2px;
+  line-height: 1.5;
+}
+
+.pixel-text-alt {
+  font-family: var(--font-silkscreen);
+}
+
+.pixel-card {
+  background: var(--card);
+  border: 4px solid var(--foreground);
+  box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+  position: relative;
+  border-radius: 0;
+}
+
+.dark .pixel-card {
+  border-color: var(--primary);
+  box-shadow: 6px 6px 0px 0px var(--primary);
+}
+
+.pixel-button {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 3px solid var(--foreground);
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+  padding: 8px 16px;
+  font-family: var(--font-silkscreen);
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+.pixel-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+}
+
+/* Foil Stamping Background Keyframes */
+@keyframes foil-bg1 {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+@keyframes foil-bg2 {
+  0% { background-position: 100% 0%; }
+  100% { background-position: 0% 100%; }
+}
+
+@keyframes foil-rotate {
+  0% { transform: rotate(115deg); }
+  100% { transform: rotate(245deg); }
+}
+
+@keyframes foil-move {
+  0% { transform: translate3d(var(--pos_x), calc(0vh - var(--size)), 0); }
+  100% { transform: translate3d(var(--pos_x), 100vh, 0); }
+}
+
+.foil-symbol:after {
+  content: var(--symbol);
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.2);
+  line-height: 1.2;
+  position: relative;
+  display: block;
+  color: transparent;
+  background-clip: text;
+  filter: brightness(1.2) hue-rotate(var(--hue));
+  background-image: url(https://images.unsplash.com/photo-1580822115965-0b2532068eff?&ixid=M3wzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2OTUxNDUzNzJ8&ixlib=rb-4.0.3&q=100&w=200&dpr=2);
+  background-position: center;
+  background-size: 200px auto;
+  background-repeat: repeat;
+  transform: translateZ(0);
+  animation: foil-bg1 var(--duration_clip) var(--delay_clip) linear infinite alternate both;
+}
+
+.foil-symbol-even:after {
+  animation-name: foil-bg2;
+}

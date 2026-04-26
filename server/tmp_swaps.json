@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "69af6085173aee11d38596d0",
+    "requester": "69af39f7e8a99351c252900a",
+    "receiver": "69af39f7e8a99351c252900a",
+    "skillOffered": "69af47cc7af3f58d1044b3b1",
+    "skillRequested": "69af45ad7af3f58d1044b3a9",
+    "status": "Pending",
+    "initialMessage": "Hey! Let's swap skills.",
+    "preferredDate": "2026-03-11T00:00:00.000Z",
+    "preferredTime": "06:00",
+    "createdAt": "2026-03-10T00:06:29.694Z",
+    "updatedAt": "2026-03-10T00:06:29.694Z",
+    "__v": 0
+  }
+]
