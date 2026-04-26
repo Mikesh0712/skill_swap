@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import EmojiPicker, { Theme as EmojiTheme } from 'emoji-picker-react';
 import { Send, Zap, Smile, MessageCircle, Video, Mic, MicOff, VideoOff, PhoneOff, Maximize2, Minimize2, X, Trash2, Paperclip, Image as ImageIcon, FileText, Download, File, ChevronDown, Edit2, Trash, MoreVertical, Eraser, Check, CheckCheck } from "lucide-react";
@@ -57,7 +57,7 @@ function ImageAttachment({ url, fileName }: { url: string; fileName: string }) {
   );
 }
 
-export default function ChatPage() {
+function ChatContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -1179,5 +1179,13 @@ export default function ChatPage() {
       </div>
     </div>
     </>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0b141a] flex items-center justify-center text-[#00a884] font-bold tracking-widest uppercase">Loading Chat...</div>}>
+      <ChatContent />
+    </Suspense>
   );
 }
