@@ -3,7 +3,7 @@
 import { MessageSquare, ThumbsUp, Plus, Trash2, X, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export default function ForumPage() {
@@ -22,7 +22,7 @@ export default function ForumPage() {
 
   useEffect(() => {
     // Attempt to figure out if logged in for delete rights
-    axios.get("http://localhost:5000/users/profile", { withCredentials: true })
+    api.get("/users/profile")
       .then(res => setCurrentUser(res.data))
       .catch(() => setCurrentUser(null));
 
@@ -33,7 +33,7 @@ export default function ForumPage() {
   const fetchNews = async () => {
     try {
       setNewsLoading(true);
-      const res = await axios.get("http://localhost:5000/news");
+      const res = await api.get("/news");
       if (res.data && res.data.articles) {
         // filter out any articles without a title
         setNews(res.data.articles.filter((a: any) => a.title && a.title !== "[Removed]").slice(0, 5));
@@ -48,7 +48,7 @@ export default function ForumPage() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/forum");
+      const res = await api.get("/forum");
       setPosts(res.data);
     } catch (err) {
       console.error(err);
@@ -63,7 +63,7 @@ export default function ForumPage() {
     if (!newPost.title.trim() || !newPost.content.trim()) return;
 
     try {
-      const res = await axios.post("http://localhost:5000/forum", newPost, { withCredentials: true });
+      const res = await api.post("/forum", newPost);
       setPosts([res.data, ...posts]);
       setIsComposing(false);
       setNewPost({ title: '', content: '', category: 'Tech Skills' });
@@ -77,7 +77,7 @@ export default function ForumPage() {
     if (!currentUser) return router.push("/login");
 
     try {
-      const res = await axios.put(`http://localhost:5000/forum/${postId}/like`, {}, { withCredentials: true });
+      const res = await api.put(`/forum/${postId}/like`);
       setPosts(posts.map(p => p._id === postId ? res.data : p));
     } catch (err) {
       console.error(err);
@@ -88,7 +88,7 @@ export default function ForumPage() {
     if (!confirm("Delete this transmission?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/forum/${postId}`, { withCredentials: true });
+      await api.delete(`/forum/${postId}`);
       setPosts(posts.filter(p => p._id !== postId));
     } catch (err) {
       console.error(err);
@@ -108,7 +108,7 @@ export default function ForumPage() {
   const handleBanUser = async (userId: string) => {
     if (!confirm("Ban this user from the forum? This deletes all their posts and issues a notification.")) return;
     try {
-      await axios.put(`http://localhost:5000/admin/banUser/${userId}`, {}, { withCredentials: true });
+      await api.put(`/admin/banUser/${userId}`);
       alert("USER BANNED AND NOTIFIED. Transmissions wiped.");
       fetchPosts();
     } catch (err) {
@@ -123,9 +123,9 @@ export default function ForumPage() {
     if (!commentText.trim()) return;
 
     try {
-      const res = await axios.post(`http://localhost:5000/forum/${postId}/comments`, {
+      const res = await api.post(`/forum/${postId}/comments`, {
         content: commentText
-      }, { withCredentials: true });
+      });
       
       setPosts(posts.map(p => p._id === postId ? res.data : p));
       setCommentText("");
