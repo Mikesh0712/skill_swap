@@ -229,7 +229,7 @@ export default function Home() {
           {/* Contact / Feedback Form */}
           <div className="space-y-4">
             <h4 className="font-bold uppercase tracking-widest text-sm border-b-2 border-blue-500/30 pb-2 inline-block text-white">Send Feedback</h4>
-            <form action="mailto:mikeshpradhan7@gmail.com" method="GET" encType="text/plain" className="space-y-3" suppressHydrationWarning>
+            <form action="mailto:mikeshpradhan7@gmail.com" method="POST" encType="text/plain" className="space-y-3" suppressHydrationWarning onSubmit={(e) => { e.preventDefault(); window.location.href = `mailto:mikeshpradhan7@gmail.com?subject=${e.currentTarget.subject.value}&body=${e.currentTarget.body.value}`; }}>
               <input 
                 type="text" 
                 name="subject"
