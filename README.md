@@ -44,16 +44,6 @@ This project was engineered to demonstrate full-stack proficiency, encompassing 
 
 ---
 
-## 💡 Note for Recruiters & Hiring Managers
-
-This platform was built as a comprehensive showcase of modern web engineering. Some specific technical challenges overcome during development include:
-
-1.  **Cross-Origin Authentication:** Successfully implemented a robust architecture to allow secure HTTP-Only cookies to be passed between a Vercel-hosted frontend and a Render-hosted backend, bypassing modern browser third-party cookie restrictions using Next.js proxy rewrites.
-2.  **WebRTC Signaling:** Engineered a custom signaling server using Socket.io to negotiate ICE candidates and SDP offers/answers, ensuring stable peer-to-peer video connections.
-3.  **Performant UI/UX:** Utilized React `Suspense` boundaries to optimize static generation and ensure seamless client-side hydration, particularly for complex route parameters and animated components.
-
----
-
 ## 👨‍💻 Author
 
 **Mikesh Kumar Pradhan**
