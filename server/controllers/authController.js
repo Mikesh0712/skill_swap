@@ -73,7 +73,9 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ 
+      $or: [{ email: email }, { username: email }] 
+    });
 
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
       // Auto-promote if email matches Admin Config (retroactive setup)

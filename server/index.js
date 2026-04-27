@@ -79,9 +79,9 @@ const globalLimiter = rateLimit({
 
 // Stricter Rate Limiting for Authentication 
 const authLimiter = rateLimit({
-  max: 15,
-  windowMs: 60 * 60 * 1000, // 1 hour
-  message: { message: 'Too many authentication attempts from this IP, please try again in an hour.' }
+  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 mins
+  message: { message: 'Too many authentication attempts from this IP, please try again in 15 minutes.' }
 });
 
 // Routes

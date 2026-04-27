@@ -1,11 +1,25 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import api from "@/lib/api";
 
 export function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = () => {
+      api.get("/users/profile")
+        .then(() => setIsAuthenticated(true))
+        .catch(() => setIsAuthenticated(false));
+    };
+
+    checkAuth();
+    window.addEventListener("auth-changed", checkAuth);
+    return () => window.removeEventListener("auth-changed", checkAuth);
+  }, []);
 
   useEffect(() => {
     // Initial loads
@@ -23,7 +37,7 @@ export function BackgroundMusic() {
       setIsMuted(currentlyMuted);
       
       if (audioRef.current) {
-        if (!currentlyMuted) {
+        if (!currentlyMuted && isAuthenticated) {
           audioRef.current.play().catch(e => {
             console.log("Autoplay prevented:", e.message);
           });
@@ -65,7 +79,7 @@ export function BackgroundMusic() {
       window.removeEventListener("click", handleInteraction);
       window.removeEventListener("keydown", handleInteraction);
     };
-  }, [hasInteracted]);
+  }, [hasInteracted, isAuthenticated]);
 
   return (
     <audio 
