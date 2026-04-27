@@ -4,12 +4,22 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import api from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,13 +27,23 @@ export default function ForgotPasswordPage() {
     setMessage("");
     setError("");
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const res = await api.post("/auth/forgot-password", { email });
+      const res = await api.put("/auth/direct-reset-password", { email, password });
       if (res.status === 200) {
-        setMessage("Password reset link has been sent to your email.");
+        setIsSuccess(true);
+        setMessage("Password has been successfully reset! Redirecting to login...");
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to process request. Please try again.");
+      setError(err.response?.data?.message || "Failed to reset password. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
@@ -44,33 +64,77 @@ export default function ForgotPasswordPage() {
 
         <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-white">Reset Password</h2>
         <p className="text-sm text-foreground/80 mb-6 text-center">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email and new password to instantly reset it.
         </p>
 
         {error && <div className="p-3 mb-4 text-sm text-red-500 bg-red-500/10 rounded-md border border-red-500/20">{error}</div>}
         {message && <div className="p-3 mb-4 text-sm text-green-500 bg-green-500/10 rounded-md border border-green-500/20">{message}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground/80">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-md bg-background/50 border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-              placeholder="name@example.com"
-              required
-            />
-          </div>
-          
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-2.5 mt-2 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isLoading ? "Sending..." : "Send Reset Link"}
-          </button>
-        </form>
+        {!isSuccess && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground/80">Email or Username</label>
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 rounded-md bg-background/50 border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                placeholder="name@example.com or username"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground/80">New Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md bg-background/50 border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all pr-10"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground/80">Confirm New Password</label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2 rounded-md bg-background/50 border border-border focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all pr-10"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-2.5 mt-2 rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Resetting..." : "Reset Password"}
+            </button>
+          </form>
+        )}
 
         <p className="mt-6 text-center text-sm text-foreground/60">
           Remember your password?{" "}
