@@ -31,7 +31,9 @@ const userSchema = new mongoose.Schema({
     isRead: { type: Boolean, default: false },
     actionAllowed: { type: String, default: null }, // e.g. "request_reentry"
     createdAt: { type: Date, default: Date.now }
-  }]
+  }],
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
