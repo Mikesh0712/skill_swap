@@ -195,29 +195,31 @@ export default function ProfilePage() {
         <div className="h-48 bg-gradient-to-r from-blue-600 via-primary to-secondary relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-overlay"></div>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90" />
-          <button 
-            onClick={() => setIsEditModalOpen(true)}
-            className="absolute top-4 right-4 bg-black/50 p-2 rounded-lg border border-white/20 hover:border-primary transition-colors text-white z-30 flex items-center gap-2"
-          >
-            <Edit2 className="w-4 h-4" /> Edit Config
-          </button>
-          <div className="absolute top-4 right-36 bg-black/50 p-2 rounded-lg border border-white/20 hover:border-primary transition-colors text-white z-30 flex items-center gap-3">
+          <div className="absolute top-4 right-4 flex flex-wrap justify-end gap-2 z-30">
+            <div className="bg-black/50 p-2 rounded-lg border border-white/20 hover:border-primary transition-colors text-white flex items-center gap-2 sm:gap-3">
+              <button 
+                onClick={toggleMusic}
+                className="flex items-center"
+                title={isMusicMuted ? "Unmute Music" : "Mute Music"}
+              >
+                {isMusicMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4 text-primary" />} 
+              </button>
+              <input 
+                type="range" 
+                min="0" 
+                max="1" 
+                step="0.05"
+                value={musicVolume}
+                onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                className="w-16 sm:w-24 h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+            </div>
             <button 
-              onClick={toggleMusic}
-              className="flex items-center"
-              title={isMusicMuted ? "Unmute Music" : "Mute Music"}
+              onClick={() => setIsEditModalOpen(true)}
+              className="bg-black/50 p-2 rounded-lg border border-white/20 hover:border-primary transition-colors text-white flex items-center gap-2"
             >
-              {isMusicMuted ? <VolumeX className="w-4 h-4 text-red-500" /> : <Volume2 className="w-4 h-4 text-primary" />} 
+              <Edit2 className="w-4 h-4" /> <span className="hidden xs:inline">Edit Config</span>
             </button>
-            <input 
-              type="range" 
-              min="0" 
-              max="1" 
-              step="0.05"
-              value={musicVolume}
-              onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-              className="w-20 sm:w-24 h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-primary"
-            />
           </div>
         </div>
         

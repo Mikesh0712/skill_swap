@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import EmojiPicker, { Theme as EmojiTheme } from 'emoji-picker-react';
-import { Send, Zap, Smile, MessageCircle, Video, Mic, MicOff, VideoOff, PhoneOff, Maximize2, Minimize2, X, Trash2, Paperclip, Image as ImageIcon, FileText, Download, File, ChevronDown, Edit2, Trash, MoreVertical, Eraser, Check, CheckCheck } from "lucide-react";
+import { Send, Zap, Smile, MessageCircle, Video, Mic, MicOff, VideoOff, PhoneOff, Maximize2, Minimize2, X, Trash2, Paperclip, Image as ImageIcon, FileText, Download, File, ChevronDown, Edit2, Trash, MoreVertical, Eraser, Check, CheckCheck, ArrowLeft, ShieldCheck, Lock } from "lucide-react";
 import api from "@/lib/api";
 import socket from "@/lib/socket";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -739,7 +739,7 @@ function ChatContent() {
       <div className="absolute bottom-20 left-20 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Lobby Sidebar */}
-      <div className="w-1/3 max-w-sm rounded-2xl flex flex-col overflow-hidden hidden md:flex z-10 bg-[#111b21] border border-[#202c33] shadow-lg">
+      <div className={`w-full md:w-1/3 md:max-w-sm rounded-2xl flex flex-col overflow-hidden z-10 bg-[#111b21] border border-[#202c33] shadow-lg ${activeRoomId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-[#202c33] bg-[#202c33]">
           <h2 className="font-bold text-[#e9edef] flex items-center gap-2">
             <MessageCircle className="w-5 h-5 text-[#00a884]" /> Chats
@@ -789,7 +789,7 @@ function ChatContent() {
       </div>
 
       {/* Active Game Chat Room */}
-      <div className="flex-1 rounded-2xl flex flex-col relative overflow-hidden z-10 bg-transparent sm:bg-black/40 sm:border border-[#202c33] shadow-xl">
+      <div className={`flex-1 rounded-2xl flex-col relative overflow-hidden z-10 bg-transparent sm:bg-black/40 sm:border border-[#202c33] shadow-xl ${!activeRoomId ? 'hidden md:flex' : 'flex'}`}>
         {!activeRoomId ? (
           <div className="flex-1 flex flex-col items-center justify-center bg-[#0b141a]">
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
@@ -807,8 +807,17 @@ function ChatContent() {
                   {otherUser?.username?.substring(0,1).toUpperCase() || 'TX'}
                 </div>
                 <div className="flex-1 flex items-center justify-between">
-                  <div>
-                    <h2 className="font-semibold text-[16px] text-[#e9edef]">{otherUser?.username}</h2>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => setActiveRoomId(null)}
+                      className="md:hidden p-2 -ml-2 text-[#aebac1] hover:text-[#e9edef] transition-colors"
+                    >
+                      <ArrowLeft className="w-6 h-6" />
+                    </button>
+                    <div>
+                      <h2 className="font-semibold text-[16px] text-[#e9edef] leading-tight">{otherUser?.username}</h2>
+                      <p className="text-[11px] text-[#00a884] font-medium">online</p>
+                    </div>
                   </div>
                   {/* WebRTC Call Init Buttons */}
                   {!isVideoCallActive && !incomingCall && (
@@ -852,75 +861,99 @@ function ChatContent() {
               </div>
             </div>
 
-            {/* Video Call Overlay */}
-            {isVideoCallActive && (
-              <div className={`${isCallMinimized ? 'h-32' : 'h-[300px] sm:h-[400px]'} border-b border-primary/30 relative bg-black flex overflow-hidden transition-all duration-300 ease-in-out`}>
-                
-                {/* Main Video (Remote by default, or Local if swapped) */}
-                <div className="w-full h-full relative cursor-pointer" onClick={() => isLocalMain && setIsLocalMain(false)}>
-                  <video 
-                    ref={isLocalMain ? localVideoRef : remoteVideoRef} 
-                    playsInline 
-                    muted={isLocalMain}
-                    onLoadedMetadata={e => { e.currentTarget.play().catch(() => {}); }}
-                    className={`w-full h-full object-cover transition-opacity duration-500 ${isLocalMain ? 'transform scale-x-[-1]' : ''}`}
-                  />
-                  {/* Overlay for voice-only call or muted video */}
-                  {((!isLocalMain && isVideoMuted) || (isLocalMain && isVideoMuted)) && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#0a1a0f] to-black z-10">
-                      <div className="w-32 h-32 rounded-full bg-secondary/20 border-4 border-secondary flex items-center justify-center text-4xl font-black text-secondary shadow-[0_0_30px_rgba(255,0,255,0.3)] animate-pulse">
-                        {(isLocalMain ? currentUser : otherUser)?.username.charAt(0).toUpperCase()}
-                      </div>
-                      <p className="mt-6 text-secondary font-mono text-sm uppercase font-bold tracking-[0.2em] neon-text-pink">Transmission Active</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Mini Preview (Local by default, or Remote if swapped) - Draggable */}
+            {/* WhatsApp Style Video Call Overlay */}
+            <AnimatePresence>
+              {isVideoCallActive && (
                 <motion.div 
-                  drag
-                  dragConstraints={{ left: -300, right: 0, top: 0, bottom: 200 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setIsLocalMain(!isLocalMain)}
-                  className="absolute bottom-4 right-4 w-32 sm:w-48 aspect-video bg-gray-900 border-2 border-primary rounded-xl overflow-hidden shadow-[0_0_20px_rgba(57,255,20,0.5)] z-40 cursor-move"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="fixed inset-0 z-[100] bg-[#0b141a] flex flex-col overflow-hidden"
                 >
-                  <video 
-                    ref={isLocalMain ? remoteVideoRef : localVideoRef} 
-                    playsInline 
-                    muted={!isLocalMain}
-                    onLoadedMetadata={e => { e.currentTarget.play().catch(() => {}); }}
-                    className={`w-full h-full object-cover ${!isLocalMain ? 'transform scale-x-[-1]' : ''}`} 
-                  />
-                  {!remoteVideoRef.current?.srcObject && !isLocalMain && (
-                    <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-                       <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  )}
-                  {((isLocalMain && isVideoMuted) || (!isLocalMain && isVideoMuted)) && (
-                     <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-                        <VideoOff className="w-6 h-6 text-red-500" />
-                     </div>
-                  )}
-                </motion.div>
+                  {/* Background: Remote Video */}
+                  <div className="absolute inset-0 z-0">
+                    <video 
+                      ref={isLocalMain ? localVideoRef : remoteVideoRef} 
+                      playsInline 
+                      muted={isLocalMain}
+                      onLoadedMetadata={e => { e.currentTarget.play().catch(() => {}); }}
+                      className={`w-full h-full object-cover transition-all duration-700 ${isLocalMain ? 'transform scale-x-[-1]' : ''} ${((!isLocalMain && isVideoMuted) || (isLocalMain && isVideoMuted)) ? 'opacity-0' : 'opacity-100'}`}
+                    />
+                    
+                    {/* Remote Muted Overlay */}
+                    {((!isLocalMain && isVideoMuted) || (isLocalMain && isVideoMuted)) && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#0a1a0f] to-[#050c08]">
+                        <div className="w-32 h-32 rounded-full bg-[#202c33] border-2 border-[#00a884]/30 flex items-center justify-center text-5xl font-bold text-[#e9edef] shadow-2xl">
+                          {(isLocalMain ? currentUser : otherUser)?.username.charAt(0).toUpperCase()}
+                        </div>
+                        <p className="mt-8 text-[#00a884] font-mono text-xs uppercase tracking-[0.3em] animate-pulse">Connection Secured</p>
+                      </div>
+                    )}
+                  </div>
 
-                {/* Call Controls */}
-                <div className={`absolute ${isCallMinimized ? 'bottom-2 right-2 flex-col scale-75' : 'bottom-6 left-1/2 -translate-x-1/2'} flex items-center gap-4 bg-black/60 px-6 py-3 rounded-full backdrop-blur-md border border-white/10 transition-all z-50 shadow-2xl`}>
-                  <button onClick={() => setIsCallMinimized(!isCallMinimized)} className="p-3 bg-primary/20 text-primary rounded-full hover:bg-primary/40 transition-all hidden sm:block">
-                    {isCallMinimized ? <Maximize2 className="w-5 h-5" /> : <Minimize2 className="w-5 h-5" />}
-                  </button>
-                  <button onClick={toggleMic} className={`p-3 rounded-full transition-all ${isMicMuted ? 'bg-red-500/20 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
-                    {isMicMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                  </button>
-                  <button onClick={endCall} className="p-4 bg-red-600 hover:bg-red-500 text-white rounded-full transition-all shadow-[0_0_20px_rgba(255,0,0,0.6)] hover:scale-110 active:scale-95">
-                    <PhoneOff className="w-6 h-6" />
-                  </button>
-                  <button onClick={toggleVideo} className={`p-3 rounded-full transition-all ${isVideoMuted ? 'bg-red-500/20 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'bg-white/10 text-white hover:bg-white/20'}`}>
-                    {isVideoMuted ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-            )}
+                  {/* Header Overlay */}
+                  <div className="absolute top-0 left-0 right-0 p-6 flex flex-col items-center z-20 bg-gradient-to-b from-black/60 to-transparent">
+                    <div className="flex items-center gap-2 text-white/60 mb-1">
+                      <Lock className="w-3 h-3" />
+                      <span className="text-[10px] uppercase tracking-widest font-bold">End-to-end encrypted</span>
+                    </div>
+                    <h2 className="text-2xl font-bold text-white tracking-tight">{otherUser?.username}</h2>
+                    <p className="text-[#00a884] text-xs font-medium mt-1">Video Call</p>
+                  </div>
+
+                  {/* Floating PiP: Local Video */}
+                  <motion.div 
+                    drag
+                    dragConstraints={{ left: -300, right: 0, top: 0, bottom: 500 }}
+                    className="absolute top-24 right-4 w-28 sm:w-40 aspect-[3/4] bg-[#111b21] border-2 border-white/10 rounded-2xl overflow-hidden shadow-2xl z-30 cursor-move"
+                    onClick={() => setIsLocalMain(!isLocalMain)}
+                  >
+                    <video 
+                      ref={isLocalMain ? remoteVideoRef : localVideoRef} 
+                      playsInline 
+                      muted={!isLocalMain}
+                      onLoadedMetadata={e => { e.currentTarget.play().catch(() => {}); }}
+                      className={`w-full h-full object-cover ${!isLocalMain ? 'transform scale-x-[-1]' : ''}`} 
+                    />
+                    {((isLocalMain && isVideoMuted) || (!isLocalMain && isVideoMuted)) && (
+                       <div className="absolute inset-0 bg-[#202c33] flex items-center justify-center">
+                          <VideoOff className="w-6 h-6 text-[#aebac1]" />
+                       </div>
+                    )}
+                  </motion.div>
+
+                  {/* Footer Controls */}
+                  <div className="absolute bottom-12 left-0 right-0 flex flex-col items-center gap-8 z-40">
+                    <div className="flex items-center gap-6 p-4 px-8 bg-[#202c33]/90 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl">
+                      <button 
+                        onClick={() => setIsCallMinimized(!isCallMinimized)} 
+                        className="p-4 text-[#aebac1] hover:text-[#e9edef] transition-all hover:bg-white/5 rounded-full"
+                      >
+                        <Minimize2 className="w-6 h-6" />
+                      </button>
+                      <button 
+                        onClick={toggleVideo} 
+                        className={`p-4 rounded-full transition-all ${isVideoMuted ? 'bg-white/10 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                      >
+                        {isVideoMuted ? <VideoOff className="w-6 h-6" /> : <Video className="w-6 h-6" />}
+                      </button>
+                      <button 
+                        onClick={toggleMic} 
+                        className={`p-4 rounded-full transition-all ${isMicMuted ? 'bg-white/10 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                      >
+                        {isMicMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+                      </button>
+                      <button 
+                        onClick={endCall} 
+                        className="p-5 bg-[#ea0038] hover:bg-[#ff0040] text-white rounded-full transition-all shadow-[0_8px_25px_rgba(234,0,56,0.4)] hover:scale-110 active:scale-95"
+                      >
+                        <PhoneOff className="w-7 h-7" />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Chat View Area */}
             <div className={`flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 font-sans relative ${isVideoCallActive && !isCallMinimized ? 'max-h-64 sm:max-h-none' : ''}`}>

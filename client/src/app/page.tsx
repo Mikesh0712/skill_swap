@@ -56,9 +56,9 @@ export default function Home() {
             ✨ Peer-to-Peer Knowledge Matrix
           </div>
           
-          <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl tracking-tight h-[60px] sm:h-[80px] flex items-center justify-center pixel-text !text-black dark:!text-blue-900 drop-shadow-[4px_4px_0px_rgba(0,0,0,0.5)] whitespace-nowrap w-full">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-tight min-h-[60px] sm:min-h-[80px] flex items-center justify-center pixel-text !text-black dark:!text-blue-900 drop-shadow-[4px_4px_0px_rgba(0,0,0,0.5)] flex-wrap w-full text-center">
             {typedText}
-            <span className="animate-pulse w-3 sm:w-4 ml-1 sm:ml-2 bg-primary h-[0.8em]" />
+            <span className="animate-pulse w-3 sm:w-4 ml-1 sm:ml-2 bg-primary h-[0.8em] inline-block shrink-0" />
           </h1>
           
           <p className="text-base md:text-lg !text-black dark:!text-blue-900 max-w-2xl mx-auto pixel-text-alt px-2 leading-relaxed">
